@@ -98,6 +98,13 @@ impl<T: Clone> RollableDie<T> for GenericDie<T> {
     }
 }
 
+impl<T: Clone> RollableDie<T> for &GenericDie<T> {
+    fn roll<R: Rng>(&self, rng: &mut R) -> T {
+        let i = rng.gen_range(0, self.faces.len());
+        self.faces[i].clone()
+    }
+}
+
 impl<T: Clone> GenericDie<T> {
     /// Create a die from an iterator of values/items representing the possible
     /// results of a roll.
@@ -122,6 +129,12 @@ pub struct RangeDie<T: SampleUniform> {
 }
 
 impl<T: SampleUniform> RollableDie<T> for RangeDie<T> {
+    fn roll<R: Rng>(&self, rng: &mut R) -> T {
+        rng.sample(&self.faces)
+    }
+}
+
+impl<T: SampleUniform> RollableDie<T> for &RangeDie<T> {
     fn roll<R: Rng>(&self, rng: &mut R) -> T {
         rng.sample(&self.faces)
     }
@@ -162,5 +175,12 @@ mod tests {
             let result = coin_flip();
             assert!(result == CoinFace::Heads || result == CoinFace::Tails);
         }
+    }
+
+    #[test]
+    fn roll_many_d20s() {
+        let rolls: Vec<i32> = n_rolls(100, &d20());
+        assert_eq!(rolls.len(), 100);
+        assert!(rolls.iter().sum::<i32>() >= 100);
     }
 }
