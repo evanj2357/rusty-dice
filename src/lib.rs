@@ -16,13 +16,13 @@ pub trait RollableDie<T> {
 }
 
 /// Simulate a die roll using a reasonably good default PRNG.
-pub fn roll<T, D: RollableDie<T>>(d: D) -> T {
+pub fn roll<T, D: RollableDie<T>>(d: &D) -> T {
     let mut rng = thread_rng();
     d.roll(&mut rng)
 }
 
 /// Simulate a number of rolls and return all of the results.
-pub fn n_rolls<T, D>(n: usize, d: D) -> Vec<T>
+pub fn n_rolls<T, D>(n: usize, d: &D) -> Vec<T>
 where
     D: RollableDie<T>,
 {
@@ -86,6 +86,7 @@ pub fn d2() -> RangeDie<i32> {
 /// faces. There is no requirement for faces to be unique; this is
 /// intentional, as it allows construction of "averaging" dice and other
 /// dice with some identical faces in an intuitive manner.
+#[derive(Clone, Debug)]
 pub struct GenericDie<T: Clone> {
     faces: Vec<T>,
 }
@@ -105,7 +106,7 @@ impl<T: Clone> GenericDie<T> {
     /// use rusty_dice::*;
     ///
     /// let abc = GenericDie::new_from(['a', 'b', 'c'].into_iter());
-    /// let first_result = roll(abc);
+    /// let first_result = roll(&abc);
     /// println!("{}", first_result);
     /// ```
     pub fn new_from<I: ExactSizeIterator<Item = T>>(iterator: I) -> Self {
