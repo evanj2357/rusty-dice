@@ -176,4 +176,11 @@ mod tests {
             assert!(result == CoinFace::Heads || result == CoinFace::Tails);
         }
     }
+
+    #[test]
+    fn roll_many_d20s() {
+        let rolls: Vec<i32> = n_rolls(100, &d20());
+        assert_eq!(rolls.len(), 100);
+        assert!(rolls.iter().sum::<i32>() >= 100);
+    }
 }
